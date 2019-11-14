@@ -1,0 +1,17 @@
+<head><style>*{padding:0;font-size:.8em;background:#222;white-space:nowrap;}</style>
+<meta charset="UTF-8"></head><body><script>
+r = Math.random
+w = 50
+n = 0x4f
+mx = (x,y) => (x+n-y)%n%2
+a = new Array(w*w).fill(0).map(x => ~~(r()*n))
+setInterval(x => {
+a = a.map((x,i) => 
+r()>.2?x:[(i%w)?a[i-1]:x,(i+1)%w?a[i+1]:x,i<w?x:a[i-w],i>=w*w-w?x:a[i+w],x]
+.reduceRight((z,y) => mx(y,x)?y:z))
+document.body.innerHTML = (a
+.map((x,i) => "&#" + (0x1F601 + x) + ";")
+.map((x,i) => (i%w?x:"<br>"+x))
+.join(""))
+}, 30)
+</script></body>

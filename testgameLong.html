@@ -1,0 +1,43 @@
+<head><style>*{padding:0;font-size:.8em;background:#222;white-space:nowrap;}</style>
+<meta charset="UTF-8"></head><body><script>
+r = Math.random // shortcut for random function
+w = 50 // width of emoji display
+n = 0x4f // length of the emoji range / number of different emojis
+/*
+function determining if emoji with id x would beat emoji with id y in a "rock, paper, scissors" type contest
+if all emojis were in a giant circle, going clockwise from an emoji every second emoji would beat it
+if there is an uneven number of emojis, this function gives correct results in both directions
+*/
+mx = (x,y) => (x+n-y)%n%2
+// create an empty array and fill it with numbers from 0 to n
+// this array is one-dimensional, buy represents an n times n square grid of emojis
+// ~~(number) is a essentially the same as Math.floor(number)
+a = new Array(w*w).fill(0).map(x => ~~(r()*n))
+// set the game timer to execute a function every 30 milliseconds
+setInterval(x => {
+    // execute another function for every element of the emoji grid
+    a = a.map((x,i) => 
+    // build an array of (in this order) the emoji cell to the left, to the right, above, below and the cell itself.
+    r()>.2? x : [
+        (i%w)? a[i-1] : x, // left cell, at the beginning of a line default to x (there is no left cell)
+        (i+1)%w? a[i+1] : x, // right cell, at the end of a line also default to x (there is no right cell)
+        i<w? x : a[i-w], // cell above, in first line default to x (no line above)
+        i>=w*w-w? x : a[i+w], // cell below, in last line default to x (no line below)
+        x // just the cell itself, in case it hasn't been added to the array already
+    ]
+    // reduce the array from the right down to one element
+    // If we find an cell that beats the current in "rock, paper, scissors" we take that one, otherwise it stays the same
+    .reduceRight((z,y) => mx(y,x)?y:z))
+    // tha array is now fully processed for this step. areas of emojis were able to grow into areas they could beat at "rock, paper, scissors"
+
+    // now calculate the display
+    // set the html of the body directly
+    document.body.innerHTML = (a
+    // build the unicode string for every emoji by adding an offset, 0x1F601 is the start of the smileys character set
+    .map((x,i) => "&#" + (0x1F601 + x) + ";")
+    // add a line break every "w" emojis
+    .map((x,i) => (i%w?x:"<br>"+x))
+    // put it all together
+    .join(""))
+}, 30)
+</script></body>
